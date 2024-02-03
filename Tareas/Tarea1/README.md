@@ -1,6 +1,7 @@
 # Tarea 1
 
 ## Link del Vídeo
+[https://youtu.be/I1nEmo4DWGc](https://youtu.be/I1nEmo4DWGc "Video")
 
 ## Comandos Utilizados
 ```sh
