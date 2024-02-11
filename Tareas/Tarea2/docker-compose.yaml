@@ -1,0 +1,32 @@
+version: '3.1'
+
+services:
+  mongo:
+    image: mongo
+    container_name: 'MongoDB'
+    volumes:
+      - volume_mongo:/var/lib/mongo      
+    ports:
+      - "27017:27017"
+    restart: always
+  
+  backend:
+    build: ./backend 
+    image: "crstn07/so1_tarea2_backend"
+    container_name: 'tarea2_backend'
+    ports:
+      - "5000:5000"
+    restart: always
+  
+  frontend:
+    build: ./frontend
+    image: 'crstn07/so1_tarea2_frontend'
+    container_name: 'tarea2_frontend'
+    ports:
+      - '3000:3000'
+    restart: always
+    depends_on:
+      - backend
+
+volumes:
+  volume_mongo:
