@@ -1,0 +1,42 @@
+version: '3.1'
+
+services:
+  mysql:
+    image: mysql
+    container_name: 'MySQL_DB'
+    volumes:
+      - volume_mysql:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - red_proyecto1
+
+  backend:
+    build: ./backend
+    image: "so1_proyecto1_backend"
+    container_name: 'proyecto1_backend'
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mysql
+    networks:
+      - red_proyecto1
+    restart: always
+
+  frontend:
+    build: ./frontend
+    image: 'so1_proyecto1_frontend'
+    container_name: 'proyecto1_frontend'
+    ports:
+      - '80:80'
+    depends_on:
+      - backend
+    networks:
+      - red_proyecto1
+    restart: always
+
+volumes:
+  volume_mysql:
+
+networks:
+  red_proyecto1:
