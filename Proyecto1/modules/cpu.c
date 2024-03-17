@@ -88,15 +88,15 @@ static struct proc_ops operaciones =
 
 static int _insert(void)
 {
-    proc_create("cpu_202004816", 0, NULL, &operaciones);
-    printk(KERN_INFO "Kevin Steve Martinez Lemus\n");
+    proc_create("cpu", 0, NULL, &operaciones);
+    printk(KERN_INFO "Se creo modulo de cpu\n");
     return 0;
 }
 
 static void _remove(void)
 {
-    remove_proc_entry("cpu_202004816", NULL);
-    printk(KERN_INFO "Primer Semestre 2023\n");
+    remove_proc_entry("cpu", NULL);
+    printk(KERN_INFO "Se elimino modulo de cpu\n");
 }
 
 module_init(_insert);

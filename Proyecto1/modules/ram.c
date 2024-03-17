@@ -50,15 +50,15 @@ static struct proc_ops operaciones =
 
 static int _insert(void)
 {
-    proc_create("ram_202004816", 0, NULL, &operaciones);
-    printk(KERN_INFO "202004816\n");
+    proc_create("ram", 0, NULL, &operaciones);
+    printk(KERN_INFO "Se montó modulo de RAM\n");
     return 0;
 }
 
 static void _remove(void)
 {
-    remove_proc_entry("ram_202004816", NULL);
-    printk(KERN_INFO "Sistemas Operativos 1\n");
+    remove_proc_entry("rams", NULL);
+    printk(KERN_INFO "Se elimino modulo de RAM\n");
 }
 
 module_init(_insert);
