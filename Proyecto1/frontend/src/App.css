@@ -1,19 +1,25 @@
 .App {
   text-align: center;
+  height: 100vh;
+  background: #000428;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to bottom, #004e92, #000428);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to bottom, #004e92, #000428); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
 
-.container {
-  margin-top: 2%;
-  width: 90%;
+.tab-content{
+  width: 100%;
 }
+.tab-pane {
+  margin-top: 20px;
+}
+
 .box {
   display: inline-block;
-  width: 45%;
-  height: 50%;
+  width: 30%;
   background-color: #FDFCE9;
   border: 1px solid #ccc;
   box-sizing: border-box;
-  margin: 1%;
+  margin: 4% 1% 1% 1%;
   padding: 2%;
   border-radius: 5%;
 }
@@ -33,4 +39,12 @@
 
 h2{
   margin: 5%;
+}
+
+.tab-pane h1{
+  color: whitesmoke;
+}
+
+.box h1{
+  color: black
 }

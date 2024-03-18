@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 //import Chart from 'chart.js';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from 'react-chartjs-2';
@@ -33,13 +33,13 @@ function PieChartRAM(props) {
       fetch(`http://localhost:5000/ram`, {
         method: 'GET',
       })
-        .then(res => res.json())
-        .catch(err => {
-          console.error('Error:', err)
+      .then(res => res.json())
+      .catch(err => {
+        console.error('Error:', err)
+        alert("Error")
       })
-        .then(response => {
-          setDatos(JSON.parse(response));
-          console.log("uso:",datos.uso, "libre:",datos.libre);
+      .then(response => {
+        setDatos(response.datos);
       })
     }, 500);
   });
@@ -51,12 +51,12 @@ function PieChartRAM(props) {
         label: 'Ram (Bytes)',
         data: [datos.uso, datos.libre],
         backgroundColor: [
-          'rgba(255, 99, 132, 0.6)',
-          'rgba(54, 162, 235, 0.6)',
+          'rgba(245, 77, 14, 0.7)',
+          'rgba(29, 245, 202, 0.7)',
         ],
         borderColor: [
-          'rgba(255, 99, 132, 1)',
-          'rgba(54, 162, 235, 1)',
+          'rgba(245, 77, 14, 1)',
+          'rgba(29, 245, 202, 1)',
         ],
         borderWidth: 1,
       },

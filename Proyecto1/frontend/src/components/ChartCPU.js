@@ -1,88 +1,74 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 //import Chart from 'chart.js';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-
-
+import { Pie } from 'react-chartjs-2';
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-function useInterval(callback, delay) {
-  const savedCallback = useRef();
+// function useInterval(callback, delay) {
+//   const savedCallback = useRef();
 
-  // Recuerda la última función de callback.
-  useEffect(() => {
-    savedCallback.current = callback;
-  }, [callback]);
+//   // Recuerda la última función de callback.
+//   useEffect(() => {
+//     savedCallback.current = callback;
+//   }, [callback]);
 
-  // Configura el intervalo.
-  useEffect(() => {
-    function tick() {
-      savedCallback.current();
-    }
+//   // Configura el intervalo.
+//   useEffect(() => {
+//     function tick() {
+//       savedCallback.current();
+//     }
 
-    if (delay !== null) {
-      let id = setInterval(tick, delay);
-      return () => clearInterval(id);
-    }
-  }, [delay]);
-}
+//     if (delay !== null) {
+//       let id = setInterval(tick, delay);
+//       return () => clearInterval(id);
+//     }
+//   }, [delay]);
+// }
 
 function PieChartCPU(props) {
-  const chartRef = useRef();
-  const [data, setData] = useState([0, 0]);
-  const [texto, setTexto] = useState('CPU');
-
+  const [datos, setDatos] = useState('');
+  
   useEffect(() => {
-    const myChartRef = chartRef.current.getContext('2d');
-    new Chart(myChartRef, {
-      type: 'pie',
-      data: {
-        labels: ['Utilizado', 'Libre'],
-        datasets: [
-          {
-            data: data,
-            backgroundColor: ['#8FE760', '#ccc'],
-            hoverBackgroundColor: ['#8FE760', '#ccc'],
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        legend: {
-          position: 'bottom',
-        },
-        tooltips: {
-          callbacks: {
-            label: function(tooltipItem, data) {
-              var value = data.datasets[0].data[tooltipItem.index];
-              return value.toString() + "%";
-            }
-          }
-        },
-        // otras opciones de la gráfica
-      }
-    });
-  }, [data]);
-
-  useInterval(() => {
-    fetch(`http://34.16.131.165:5000/cpu`, {
-      method: 'GET',
-    })
+    setTimeout(() => {
+      fetch(`http://localhost:5000/cpu`, {
+        method: 'GET',
+      })
       .then(res => res.json())
       .catch(err => {
         console.error('Error:', err)
-        //alert("Ocurrio un error, ver la consola")
-    })
+        alert("Error")
+      })
       .then(response => {
-        setData([response.cpu, 100-response.cpu]);
-        setTexto('CPU ' + response.cpu + "%")
-    })  
-  }, 2000);
+        setDatos(response.datos);
+      })
+        
+    }, 1010);
+  });
+
+  const data = {
+    labels: ['En Uso', 'Libre'],
+    datasets: [
+      {
+        label: 'CPU (%)',
+        data: [datos.uso, datos.libre],
+        backgroundColor: [
+          'rgba(250, 222, 55, 0.7)',
+          'rgba(75, 54, 250, 0.7)',
+        ],
+        borderColor: [
+          'rgba(250, 222, 55, 1)',
+          'rgba(75, 54, 250, 0.1)',
+        ],
+        borderWidth: 1,
+      },
+    ],
+  };
 
   return (
-    <div>
-      <h2>{texto}</h2>
-      <canvas id="myChart" ref={chartRef} />
-    </div>
+    <><h1>CPU</h1><div className="divpie">
+      <h3>{datos.uso}% en uso</h3>
+      <Pie data={data} />
+    </div></>
   );
 }
 

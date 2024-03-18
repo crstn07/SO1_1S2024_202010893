@@ -43,11 +43,11 @@ static int escribir_a_proc(struct seq_file *file_proc, void *v)
         total_usage += cpu_time;
     }
     //---------------------------------------------------------------------------
-    seq_printf(file_proc, "{\n\"cpu_total\":%lu,\n", total_cpu_time);
-    seq_printf(file_proc, "\"cpu_porcentaje\":%lu,\n", (total_usage * 100) / total_cpu_time);
-    seq_printf(file_proc, "\"cpu_usado\":%lu,\n", total_usage);
-    seq_printf(file_proc, "\"cpu_libre\":%lu,\n", total_cpu_time - total_usage);
-    seq_printf(file_proc, "\"processes\":[\n");
+    seq_printf(file_proc, "{\n\"total\":%lu,\n", total_cpu_time);
+    seq_printf(file_proc, "\"porcentaje\":%lu,\n", (total_usage * 100) / total_cpu_time);
+    seq_printf(file_proc, "\"uso\":%lu,\n", total_usage);
+    seq_printf(file_proc, "\"libre\":%lu,\n", total_cpu_time - total_usage);
+    seq_printf(file_proc, "\"procesos\":[\n");
     
     // otro codigo
     // unsigned long total_cpu_time = jiffies_to_msecs(get_jiffies_64());
@@ -84,13 +84,13 @@ static int escribir_a_proc(struct seq_file *file_proc, void *v)
             seq_printf(file_proc, ",{");
         }
         seq_printf(file_proc, "\"pid\":%d,\n", task->pid);
-        seq_printf(file_proc, "\"name\":\"%s\",\n", task->comm);
-        seq_printf(file_proc, "\"user\": %d,\n", task->cred->uid);
+        seq_printf(file_proc, "\"nombre\":\"%s\",\n", task->comm);
+        seq_printf(file_proc, "\"usuario\": %d,\n", task->cred->uid);
         //seq_printf(file_proc, "\"state\":%ld,\n", task->__state);
         int porcentaje = (rss * 100) / total_ram_pages;
         //seq_printf(file_proc, "\"ram\":%d,\n", porcentaje);
 
-        seq_printf(file_proc, "\"child\":[\n");
+        seq_printf(file_proc, "\"hijo\":[\n");
         int a = 0;
         list_for_each(list, &(task->children))
         {
@@ -99,7 +99,7 @@ static int escribir_a_proc(struct seq_file *file_proc, void *v)
             {
                 seq_printf(file_proc, ",{");
                 seq_printf(file_proc, "\"pid\":%d,\n", task_child->pid);
-                seq_printf(file_proc, "\"name\":\"%s\",\n", task_child->comm);
+                seq_printf(file_proc, "\"nombre\":\"%s\",\n", task_child->comm);
                 //seq_printf(file_proc, "\"state\":%ld,\n", task_child->__state);
                 seq_printf(file_proc, "\"pidPadre\":%d\n", task->pid);
                 seq_printf(file_proc, "}\n");
@@ -108,7 +108,7 @@ static int escribir_a_proc(struct seq_file *file_proc, void *v)
             {
                 seq_printf(file_proc, "{");
                 seq_printf(file_proc, "\"pid\":%d,\n", task_child->pid);
-                seq_printf(file_proc, "\"name\":\"%s\",\n", task_child->comm);
+                seq_printf(file_proc, "\"nombre\":\"%s\",\n", task_child->comm);
                 //seq_printf(file_proc, "\"state\":%ld,\n", task_child->__state);
                 seq_printf(file_proc, "\"pidPadre\":%d\n", task->pid);
                 seq_printf(file_proc, "}\n");
@@ -116,34 +116,10 @@ static int escribir_a_proc(struct seq_file *file_proc, void *v)
             }
         }
         a = 0;
-        seq_printf(file_proc, "\n]");
-
-        // if (task->__state == 0)
-        // {
-        //     running += 1;
-        // }
-        // else if (task->__state == 1)
-        // {
-        //     sleeping += 1;
-        // }
-        // else if (task->__state == 4)
-        // {
-        //     zombie += 1;
-        // }
-        // else
-        // {
-        //     stopped += 1;
-        // }
-        seq_printf(file_proc, "}\n");
+        seq_printf(file_proc, "\n]}\n");
     }
     b = 0;
-    seq_printf(file_proc, "],\n");
-    // seq_printf(file_proc, "\"running\":%d,\n", running);
-    // seq_printf(file_proc, "\"sleeping\":%d,\n", sleeping);
-    // seq_printf(file_proc, "\"zombie\":%d,\n", zombie);
-    // seq_printf(file_proc, "\"stopped\":%d,\n", stopped);
-    // seq_printf(file_proc, "\"total\":%d\n", running + sleeping + zombie + stopped);
-    seq_printf(file_proc, "}\n");
+    seq_printf(file_proc, "]\n}\n");
     return 0;
 }
 
