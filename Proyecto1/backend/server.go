@@ -1,21 +1,32 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
+	"os/exec"
 
 	"github.com/rs/cors"
-	"github.com/go-sql-driver/mysql"
 )
 
 func main() {
-	fmt.Println("Sistemas Operativos 1 - Tarea 1")
 	mux := http.NewServeMux()
-	mux.HandleFunc("/data", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/ram", func(w http.ResponseWriter, r *http.Request) {
+		// Comando a ejecutar
+		cmd := exec.Command("cat", "/proc/ram_so1_1s2024")
+
+		// Capturar la salida estándar y de error
+		output, err := cmd.CombinedOutput()
+
+		if err != nil {
+			//return fmt.Sprintf("Error al ejecutar el comando: %s", err)
+			w.Write([]byte(`{"error": "Error al ejecutar el comando"}`))
+		}
+		// Imprimir la salida del comandostring(output)
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"datos": "Cristian Daniel Pereira Tezagüic - 202010893"}`))
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(fmt.Sprintf(`{"datos": %s}`, string(output))))
 	})
 
 	fmt.Println("Servidor corriendo en el puerto 5000")
