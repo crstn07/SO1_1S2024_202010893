@@ -4,6 +4,9 @@ services:
   mysql:
     image: mysql
     container_name: 'MySQL_DB'
+    environment:
+      MYSQL_DATABASE: so1_proyecto1
+      MYSQL_ROOT_PASSWORD: password
     volumes:
       - volume_mysql:/var/lib/mysql
     ports:

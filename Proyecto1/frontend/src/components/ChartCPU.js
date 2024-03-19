@@ -4,27 +4,6 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from 'react-chartjs-2';
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-// function useInterval(callback, delay) {
-//   const savedCallback = useRef();
-
-//   // Recuerda la última función de callback.
-//   useEffect(() => {
-//     savedCallback.current = callback;
-//   }, [callback]);
-
-//   // Configura el intervalo.
-//   useEffect(() => {
-//     function tick() {
-//       savedCallback.current();
-//     }
-
-//     if (delay !== null) {
-//       let id = setInterval(tick, delay);
-//       return () => clearInterval(id);
-//     }
-//   }, [delay]);
-// }
-
 function PieChartCPU(props) {
   const [datos, setDatos] = useState('');
   
@@ -52,12 +31,12 @@ function PieChartCPU(props) {
         label: 'CPU (%)',
         data: [datos.uso, datos.libre],
         backgroundColor: [
-          'rgba(250, 222, 55, 0.7)',
           'rgba(75, 54, 250, 0.7)',
+          'rgba(250, 222, 55, 0.7)',
         ],
         borderColor: [
-          'rgba(250, 222, 55, 1)',
           'rgba(75, 54, 250, 0.1)',
+          'rgba(250, 222, 55, 1)',
         ],
         borderWidth: 1,
       },

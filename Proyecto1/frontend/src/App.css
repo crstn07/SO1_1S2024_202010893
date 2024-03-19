@@ -1,25 +1,34 @@
 .App {
   text-align: center;
   height: 100vh;
-  background: #000428;  /* fallback for old browsers */
-  background: -webkit-linear-gradient(to bottom, #004e92, #000428);  /* Chrome 10-25, Safari 5.1-6 */
-  background: linear-gradient(to bottom, #004e92, #000428); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-}
+ }
 
 .tab-content{
   width: 100%;
 }
 .tab-pane {
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .box {
   display: inline-block;
-  width: 30%;
+  height: 75vh;
   background-color: #FDFCE9;
   border: 1px solid #ccc;
   box-sizing: border-box;
-  margin: 4% 1% 1% 1%;
+  margin: 3% 1% 1% 1%;
+  padding: 2%;
+  border-radius: 5%;
+}
+
+.box2 {
+  display: inline-block;
+  width: 45%;
+  height: 65vh;
+  background-color: #FDFCE9;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  margin: 3% 1% 1% 1%;
   padding: 2%;
   border-radius: 5%;
 }
@@ -45,6 +54,11 @@ h2{
   color: whitesmoke;
 }
 
-.box h1{
+.box h1, .box2 h1{
   color: black
+}
+
+.nav-link {
+  color: white;
+  font-size: 20px;
 }
