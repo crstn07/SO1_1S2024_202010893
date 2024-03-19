@@ -3,6 +3,7 @@ import PieChartCPU from './components/ChartCPU.js';
 import PieChartRAM from './components/ChartRAM.js';
 import HistCPU from './components/ChartCPUHist.js';
 import HistRAM from './components/ChartRAMHist.js';
+import ArbolProcesos from './components/Procesos.js';
 
 //import Arbol from './components/Procesos.js'
 //import ProcesosTabla from './components/CProcesos';
@@ -43,7 +44,10 @@ function App() {
               <HistRAM />
             </div>
           </div>
-          <div className="tab-pane fade" id="v-pills-tree" role="tabpanel" aria-labelledby="v-pills-tree-tab" tabIndex="0">...</div>
+          <div className="tab-pane fade" id="v-pills-tree" role="tabpanel" aria-labelledby="v-pills-tree-tab" tabIndex="0">
+            <h1>Árbol de Procesos</h1>
+            <ArbolProcesos/>
+          </div>
           <div className="tab-pane fade" id="v-pills-simulation" role="tabpanel" aria-labelledby="v-pills-simulation-tab" tabIndex="0">...</div>
         </div>
       </div>
