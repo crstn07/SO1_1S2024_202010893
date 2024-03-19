@@ -107,6 +107,94 @@ func main() {
 		w.Write([]byte(fmt.Sprintf(`{"datos": %s}`, string(output))))
 	})
 
+	mux.HandleFunc("/nuevo", func(w http.ResponseWriter, r *http.Request) {
+		// Crear un nuevo proceso con un comando de espera
+		cmd := exec.Command("sleep", "infinity")
+		err := cmd.Start()
+		if err != nil {
+			fmt.Print(err)
+			http.Error(w, "Error al iniciar el proceso", http.StatusInternalServerError)
+			return
+		}
+
+		// Obtener el comando con PID
+		process := cmd
+
+		fmt.Fprintf(w, `{"pid":%d}`, process.Process.Pid)
+	})
+
+	mux.HandleFunc("/parar", func(w http.ResponseWriter, r *http.Request) {
+		pidStr := r.URL.Query().Get("pid")
+		if pidStr == "" {
+			http.Error(w, "Se requiere el parámetro 'pid'", http.StatusBadRequest)
+			return
+		}
+
+		pid, err := strconv.Atoi(pidStr)
+		if err != nil {
+			http.Error(w, "El parámetro 'pid' debe ser un número entero", http.StatusBadRequest)
+			return
+		}
+
+		// Enviar señal SIGSTOP al proceso con el PID proporcionado
+		cmd := exec.Command("kill", "-SIGSTOP", strconv.Itoa(pid))
+		err = cmd.Run()
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error al detener el proceso con PID %d", pid), http.StatusInternalServerError)
+			return
+		}
+
+		fmt.Fprintf(w, `{"mensaje":"Proceso con PID %d detenido"}`, pid)
+	})
+
+	mux.HandleFunc("/resumir", func(w http.ResponseWriter, r *http.Request) {
+		pidStr := r.URL.Query().Get("pid")
+		if pidStr == "" {
+			http.Error(w, "Se requiere el parámetro 'pid'", http.StatusBadRequest)
+			return
+		}
+
+		pid, err := strconv.Atoi(pidStr)
+		if err != nil {
+			http.Error(w, "El parámetro 'pid' debe ser un número entero", http.StatusBadRequest)
+			return
+		}
+
+		// Enviar señal SIGCONT al proceso con el PID proporcionado
+		cmd := exec.Command("kill", "-SIGCONT", strconv.Itoa(pid))
+		err = cmd.Run()
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error al reanudar el proceso con PID %d", pid), http.StatusInternalServerError)
+			return
+		}
+
+		fmt.Fprintf(w, `{"mensaje":"Proceso con PID %d reanudado"}`, pid)
+	})
+
+	mux.HandleFunc("/matar", func(w http.ResponseWriter, r *http.Request) {
+		pidStr := r.URL.Query().Get("pid")
+		if pidStr == "" {
+			http.Error(w, "Se requiere el parámetro 'pid'", http.StatusBadRequest)
+			return
+		}
+
+		pid, err := strconv.Atoi(pidStr)
+		if err != nil {
+			http.Error(w, "El parámetro 'pid' debe ser un número entero", http.StatusBadRequest)
+			return
+		}
+
+		// Enviar señal SIGCONT al proceso con el PID proporcionado
+		cmd := exec.Command("kill", "-9", strconv.Itoa(pid))
+		err = cmd.Run()
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error al intentar terminar el proceso con PID %d", pid), http.StatusInternalServerError)
+			return
+		}
+
+		fmt.Fprintf(w, `{"mensaje":"Proceso con PID %d ha terminado"}`, pid)
+	})
+
 	fmt.Println("Servidor corriendo en el puerto 5000")
 	handler := cors.Default().Handler(mux)
 	log.Fatal(http.ListenAndServe(":5000", handler))

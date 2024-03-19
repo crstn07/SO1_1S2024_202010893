@@ -18,6 +18,12 @@ services:
     build: ./backend
     image: "so1_proyecto1_backend"
     container_name: 'proyecto1_backend'
+    privileged: true
+    pid: host
+    volumes:
+      - type: bind
+        source: /proc
+        target: /proc
     ports:
       - "5000:5000"
     depends_on:
