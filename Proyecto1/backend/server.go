@@ -43,7 +43,7 @@ func main() {
 		w.Header().Set("Content-Type", "application/json")
 
 		// Comando a ejecutar
-		cmd := exec.Command("mpstat",  "1", "1")
+		cmd := exec.Command("mpstat", "1", "1")
 		// Capturar la salida estándar y de error
 		output, err := cmd.CombinedOutput()
 
@@ -281,9 +281,7 @@ func insertar() (e error) {
 			// Convertir la salida a una cadena
 			outputStr := string(output2)
 			lines := strings.Split(outputStr, "\n")
-			fmt.Println("lines",lines[3])
 			fields := strings.Fields(lines[3])
-			fmt.Println("field[10]:",fields[10])
 			idleStr := fields[10]
 
 			// Convertir el valor de idle CPU a un número flotante
