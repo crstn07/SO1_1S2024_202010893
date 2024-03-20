@@ -29,7 +29,7 @@ function PieChartRAM(props) {
   
   useEffect(() => {
     setTimeout(() => {
-      fetch(`http://localhost:5000/ram`, {
+      fetch(`/api/ram`, {
         method: 'GET',
       })
       .then(res => res.json())

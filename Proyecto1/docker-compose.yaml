@@ -16,7 +16,7 @@ services:
 
   backend:
     build: ./backend
-    image: "so1_proyecto1_backend"
+    image: "crstn07/so1_proyecto1_backend"
     container_name: 'proyecto1_backend'
     privileged: true
     pid: host
@@ -34,7 +34,7 @@ services:
 
   frontend:
     build: ./frontend
-    image: 'so1_proyecto1_frontend'
+    image: 'crstn07/so1_proyecto1_frontend'
     container_name: 'proyecto1_frontend'
     ports:
       - '80:80'

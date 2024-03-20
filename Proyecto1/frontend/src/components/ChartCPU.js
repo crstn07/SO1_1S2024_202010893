@@ -9,7 +9,7 @@ function PieChartCPU(props) {
   
   useEffect(() => {
     setTimeout(() => {
-      fetch(`http://localhost:5000/cpu`, {
+      fetch(`/api/cpu`, {
         method: 'GET',
       })
       .then(res => res.json())

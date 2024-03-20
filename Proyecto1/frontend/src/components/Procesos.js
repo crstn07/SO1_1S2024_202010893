@@ -41,7 +41,7 @@ function graficarArbol(pid,procesos) {
 function ArbolProcesos() {
   async function getProcesos() {
 
-    fetch(`http://localhost:5000/procesos`, {
+    fetch(`/api/procesos`, {
       method: 'GET',
     })
     .then(res => res.json())

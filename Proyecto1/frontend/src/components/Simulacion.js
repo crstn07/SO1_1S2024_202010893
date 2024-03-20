@@ -5,7 +5,7 @@ function Simulacion() {
     const [pid, setPID] = useState('');
 
     async function nuevo() {
-        fetch(`http://localhost:5000/nuevo`, {
+        fetch(`/api/nuevo`, {
             method: 'GET',
         })
             .then(res => res.json())
@@ -20,7 +20,7 @@ function Simulacion() {
     }
 
     async function matar() {
-        fetch(`http://localhost:5000/matar?pid=${pid}`, {
+        fetch(`/api/matar?pid=${pid}`, {
             method: 'GET',
         })
             .then(res => res.json())
@@ -34,7 +34,7 @@ function Simulacion() {
     }
 
     async function parar() {
-        fetch(`http://localhost:5000/parar?pid=${pid}`, {
+        fetch(`/api/parar?pid=${pid}`, {
             method: 'GET',
         })
             .then(res => res.json())
@@ -47,7 +47,7 @@ function Simulacion() {
             })
     }
     async function resumir() {
-        fetch(`http://localhost:5000/resumir?pid=${pid}`, {
+        fetch(`/api/resumir?pid=${pid}`, {
             method: 'GET',
         })
             .then(res => res.json())

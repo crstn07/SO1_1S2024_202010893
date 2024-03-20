@@ -19,7 +19,7 @@ func main() {
 	createTables()
 	go insertar()
 	mux := http.NewServeMux()
-	mux.HandleFunc("/ram", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/ram", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
 		// Comando a ejecutar
@@ -39,11 +39,11 @@ func main() {
 		w.Write([]byte(fmt.Sprintf(`{"datos": %s}`, string(output))))
 	})
 	//mpstat | awk '{print $12}' | sed 's/'%idle'//g' | sed -z 's/\n//g'
-	mux.HandleFunc("/cpu", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/cpu", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
 		// Comando a ejecutar
-		cmd := exec.Command("mpstat", "-P", "0", "1", "1")
+		cmd := exec.Command("mpstat",  "1", "1")
 		// Capturar la salida estándar y de error
 		output, err := cmd.CombinedOutput()
 
@@ -63,7 +63,7 @@ func main() {
 		fields := strings.Fields(lines[3])
 
 		// Recuperar el valor de idle CPU (en la columna 12)
-		idleStr := fields[11]
+		idleStr := fields[10]
 
 		// Convertir el valor de idle CPU a un número flotante
 		idle, err := strconv.ParseFloat(idleStr, 64)
@@ -76,7 +76,7 @@ func main() {
 		w.Write([]byte(fmt.Sprintf(`{"datos": {"uso":%f,"libre":%f}}`, 100-idle, idle)))
 	})
 
-	mux.HandleFunc("/hist", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/hist", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		datos := obtenerDatos()
@@ -89,7 +89,7 @@ func main() {
 		w.Write([]byte(fmt.Sprintf(`{"datos": %s}`, string(datosJSON))))
 	})
 
-	mux.HandleFunc("/procesos", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/procesos", func(w http.ResponseWriter, r *http.Request) {
 		// Comando a ejecutar
 		cmd := exec.Command("cat", "/proc/cpu_so1_1s2024")
 
@@ -107,7 +107,7 @@ func main() {
 		w.Write([]byte(fmt.Sprintf(`{"datos": %s}`, string(output))))
 	})
 
-	mux.HandleFunc("/nuevo", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/nuevo", func(w http.ResponseWriter, r *http.Request) {
 		// Crear un nuevo proceso con un comando de espera
 		cmd := exec.Command("sleep", "infinity")
 		err := cmd.Start()
@@ -123,7 +123,7 @@ func main() {
 		fmt.Fprintf(w, `{"pid":%d}`, process.Process.Pid)
 	})
 
-	mux.HandleFunc("/parar", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/parar", func(w http.ResponseWriter, r *http.Request) {
 		pidStr := r.URL.Query().Get("pid")
 		if pidStr == "" {
 			http.Error(w, "Se requiere el parámetro 'pid'", http.StatusBadRequest)
@@ -147,7 +147,7 @@ func main() {
 		fmt.Fprintf(w, `{"mensaje":"Proceso con PID %d detenido"}`, pid)
 	})
 
-	mux.HandleFunc("/resumir", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/resumir", func(w http.ResponseWriter, r *http.Request) {
 		pidStr := r.URL.Query().Get("pid")
 		if pidStr == "" {
 			http.Error(w, "Se requiere el parámetro 'pid'", http.StatusBadRequest)
@@ -171,7 +171,7 @@ func main() {
 		fmt.Fprintf(w, `{"mensaje":"Proceso con PID %d reanudado"}`, pid)
 	})
 
-	mux.HandleFunc("/matar", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/matar", func(w http.ResponseWriter, r *http.Request) {
 		pidStr := r.URL.Query().Get("pid")
 		if pidStr == "" {
 			http.Error(w, "Se requiere el parámetro 'pid'", http.StatusBadRequest)
@@ -203,7 +203,7 @@ func main() {
 func nuevaConexion() (db *sql.DB, e error) {
 	USER := "root"
 	PASS := "password"
-	HOST := "tcp(localhost:3306)"
+	HOST := "tcp(mysql:3306)"
 	DB := "so1_proyecto1"
 	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@%s/%s", USER, PASS, HOST, DB))
 	if err != nil {
@@ -258,7 +258,7 @@ func insertar() (e error) {
 			output, err := cmd.CombinedOutput()
 
 			if err != nil {
-				fmt.Printf("Error al ejecutar el comando: %s", err)
+				fmt.Printf("Error al ejecutar el comando1: %s", err)
 				return err
 			}
 
@@ -270,19 +270,21 @@ func insertar() (e error) {
 			}
 
 			// Comando a ejecutar
-			cmd2 := exec.Command("mpstat", "-P", "0", "1", "1")
+			cmd2 := exec.Command("mpstat", "1", "1")
 			// Capturar la salida estándar y de error
 			output2, err3 := cmd2.CombinedOutput()
 
 			if err3 != nil {
-				fmt.Printf("Error al ejecutar el comando: %s", err3)
+				fmt.Printf("Error al ejecutar el comando2: %s", err3)
 				return err3
 			}
 			// Convertir la salida a una cadena
 			outputStr := string(output2)
 			lines := strings.Split(outputStr, "\n")
+			fmt.Println("lines",lines[3])
 			fields := strings.Fields(lines[3])
-			idleStr := fields[11]
+			fmt.Println("field[10]:",fields[10])
+			idleStr := fields[10]
 
 			// Convertir el valor de idle CPU a un número flotante
 			cpu, err := strconv.ParseFloat(idleStr, 64)

@@ -16,7 +16,7 @@ function HistRAM(props){
 
   useEffect(() => {
     setTimeout(() => {
-      fetch(`http://localhost:5000/hist`, {
+      fetch(`/api/hist`, {
         method: 'GET',
       })
       .then(res => res.json())
