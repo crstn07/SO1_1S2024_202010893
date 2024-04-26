@@ -42,11 +42,23 @@ class trafficData(HttpUser):
             print("Empty") #No hay mas datos por enviar
             self.stop(True)
 
+    @task
+    def sendMessage2(self):
+        data = self.reader.getData() #Registro obtenido de la lista
+        if data is not None:
+            res = self.client.post("/rust/send_data", json=data)
+            response = res.json()
+            print(response)
+        else:
+            print("Empty") #No hay mas datos por enviar
+            self.stop(True)
+
 # python3 -m venv venv
 # source venv/bin/activate
 # pip install locust
 # locust -f tu_script.py -> locust -f traffic.py
 # http://localhost:3300 
 # http://0.0.0.0:8089
+# ingress: http://34.70.145.21
 
 
