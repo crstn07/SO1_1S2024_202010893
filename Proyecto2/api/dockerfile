@@ -1,0 +1,16 @@
+FROM node:18.17.1-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+EXPOSE 5000
+
+CMD ["node", "index.js"]
+
+# docker build -t crstn07/so1-p2-api .
+# docker push crstn07/so1-p2-api 

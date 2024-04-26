@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grpc
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      role: grpc
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        role: grpc
+
+    spec:
+      containers:
+      - name: grpc-cliente
+        image: crstn07/so1-p2-grpc-client
+        ports:
+        - containerPort: 3002
+      - name: grpc-servidor
+        image: crstn07/so1-p2-grpc-server
+        ports:
+        - containerPort: 3001
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-grpc
+  namespace: default
+spec:
+  type: LoadBalancer
+  ports:
+  - name: grpc-cliente-port
+    port: 3002
+    targetPort: 3002
+  - name: grpc-servidor-port
+    port: 3001
+    targetPort: 3001
+  selector:
+    role: grpc
