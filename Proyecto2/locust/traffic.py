@@ -22,9 +22,17 @@ class readFile():
                 self.data = json.loads(file.read())
         except Exception:
             print(f'Error : {Exception}')
+    
+    def loadFile2(self):
+        print("Cargando ...")
+        try:
+            with open("data2.json", 'r', encoding='utf-8') as file:
+                self.data = json.loads(file.read())
+        except Exception:
+            print(f'Error : {Exception}')
 
 class trafficData(HttpUser):
-    wait_time = between(0.1, 0.9) #Tiempo de espera entre registros
+    wait_time = between(0.1, 0.2) #Tiempo de espera entre registros
     reader = readFile()
     reader.loadFile()
 
@@ -41,12 +49,13 @@ class trafficData(HttpUser):
         else:
             print("Empty") #No hay mas datos por enviar
             self.stop(True)
-
+    
+    reader.loadFile2()
     @task
     def sendMessage2(self):
-        data = self.reader.getData() #Registro obtenido de la lista
-        if data is not None:
-            res = self.client.post("/rust/send_data", json=data)
+        data2 = self.reader.getData() #Registro obtenido de la lista
+        if data2 is not None:
+            res = self.client.post("/rust/send_data", json=data2)
             response = res.json()
             print(response)
         else:

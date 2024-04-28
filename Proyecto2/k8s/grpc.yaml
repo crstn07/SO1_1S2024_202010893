@@ -20,7 +20,7 @@ spec:
         ports:
         - containerPort: 3002
       - name: grpc-servidor
-        image: crstn07/so1-p2-grpc-server
+        image: crstn07/so1-p2-grpc-servi
         ports:
         - containerPort: 3001
 ---
@@ -30,7 +30,7 @@ metadata:
   name: service-grpc
   namespace: default
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
   - name: grpc-cliente-port
     port: 3002

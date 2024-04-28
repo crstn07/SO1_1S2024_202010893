@@ -29,7 +29,7 @@ kind: Service
 metadata:
   name: service-rust
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
   - name: rust-client-port
     port: 8000

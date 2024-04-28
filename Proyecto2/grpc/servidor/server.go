@@ -6,21 +6,13 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"time"
-
-	"github.com/go-redis/redis/v8"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"strings"
 
 	pb "server/proto"
 
+	"github.com/IBM/sarama"
 	"google.golang.org/grpc"
 )
-
-var ctx = context.Background()
-var db *mongo.Database
-var rdb *redis.Client
 
 type server struct {
 	pb.UnimplementedGetInfoServer
@@ -33,45 +25,10 @@ type Data struct {
 	Rank  string
 }
 
-type Log struct {
-	Id      primitive.ObjectID `bson:"_id,omitempty"`
-	Mensaje string
-	Fecha   time.Time
-}
-
-func mongoConnect() {
-	clientOptions := options.Client().ApplyURI("mongodb://35.193.21.119:27017")
-	client, err := mongo.Connect(ctx, clientOptions)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = client.Ping(ctx, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	db = client.Database("so1-proyecto2")
-	fmt.Println("Conexión a MongoDB exitosa")
-}
-
-func redisConnect() {
-	rdb = redis.NewClient(&redis.Options{
-		Addr:     "35.194.26.20:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
-	})
-
-	pong, err := rdb.Ping(ctx).Result()
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Conexión a Redis exitosa:", pong)
-}
+var producer sarama.SyncProducer
 
 func (s *server) ReturnInfo(ctx context.Context, in *pb.RequestId) (*pb.ReplyInfo, error) {
-
-	fmt.Println("Recibí de cliente: ", in.GetName())
+	fmt.Println("Recibí del cliente: ", in.GetName())
 	data := Data{
 		Name:  in.GetName(),
 		Album: in.GetAlbum(),
@@ -80,52 +37,65 @@ func (s *server) ReturnInfo(ctx context.Context, in *pb.RequestId) (*pb.ReplyInf
 	}
 	fmt.Println(data)
 
-	// Insertar el mensaje en MongoDB con fecha y hora
-	insertMongoDB(Log{
-		Mensaje: "Voto recibido para: " + data.Name + " - " + data.Album,
-		Fecha:   time.Now(), // Obtener la hora actual
-	})
+	datos, err := json.Marshal(data)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return nil, err
+	}
+	// Tema al que enviar mensajes
+	topic := "votaciones"
+	str := string(datos)
+	str = strings.ReplaceAll(str, "Name", "name")
+	str = strings.ReplaceAll(str, "Album", "album")
+	str = strings.ReplaceAll(str, "Year", "year")
+	str = strings.ReplaceAll(str, "Rank", "rank")
 
-	// Insertar los datos en Redis
-	insertRedis(data)
+	// Mensaje a enviar
+	message := &sarama.ProducerMessage{
+		Topic: topic,
+		Value: sarama.StringEncoder(string(str)),
+	}
+
+	// Enviar el mensaje usando el productor global
+	partition, offset, err := producer.SendMessage(message)
+	if err != nil {
+		fmt.Printf("Error al enviar el mensaje: %v\n", err)
+		return nil, err
+	}
+
+	fmt.Printf("Mensaje enviado a la partición %d, offset %d\n", partition, offset)
 
 	return &pb.ReplyInfo{Info: "Hola cliente, recibí el comentario"}, nil
 }
 
-func insertMongoDB(log Log) {
-	collection := db.Collection("logs")
-
-	_, err := collection.InsertOne(ctx, log)
-	if err != nil {
-		fmt.Println("Error al insertar en MongoDB:", err)
-	}
-}
-
-func insertRedis(data Data) {
-	// Almacenar el valor en Redis
-	datos, err := json.Marshal(data)
-	if err != nil {
-		fmt.Println("Error:", err)
-		return
-	}
-	result, err := rdb.HIncrBy(ctx, "data", string(datos), 1).Result()
-	if err != nil {
-		fmt.Println("Error al insertar en Redis:", err)
-		return
-	}
-	fmt.Println("Contador en Redis", result)
-}
-
 func main() {
+	// Configuración del productor
+	config := sarama.NewConfig()
+	config.Producer.Return.Successes = true
+
+	// Lista de brokers de Kafka
+	brokers := []string{"my-cluster-kafka-bootstrap:9092"}
+
+	// Crear un productor
+	var err error
+	producer, err = sarama.NewSyncProducer(brokers, config)
+	if err != nil {
+		fmt.Printf("Error al crear el productor: %v\n", err)
+		return
+	}
+	defer func() {
+		if err := producer.Close(); err != nil {
+			fmt.Printf("Error al cerrar el productor: %v\n", err)
+		}
+	}()
+
+	fmt.Println("Servidor escuchando en puerto 3001")
 	listen, err := net.Listen("tcp", ":3001")
 	if err != nil {
 		log.Fatalln(err)
 	}
 	s := grpc.NewServer()
 	pb.RegisterGetInfoServer(s, &server{})
-
-	mongoConnect()
-	redisConnect()
 
 	if err := s.Serve(listen); err != nil {
 		log.Fatalln(err)

@@ -68,31 +68,45 @@ Se tenía una API en Node y una aplicación web con Vue.js en la cual se podían
 ![Deployments y Services](./imgs/deploys.png)
 En la imagen anterior se pueden observar los siguientes deployments y services:
 
-### Deployments:
+### Deployments
 
-1. **pod/grafana-6756f658b-bbw79**: Es un pod que forma parte del deployment de Grafana. Tiene 1 contenedor.
+1. **consumer**: Este deployment corresponde al consumidor Go que está encargado de recibir los datos de las colas de Kafka y almacenarlos en las bases de datos Redis y MongoDB. Este deployment tiene 2 réplicas iniciales y un auto-scaling de hasta 5 réplicas. En la imagen se muestra que tiene 5 réplicas disponibles.
 
-2. **pod/grpc-68ccd565d4-5wz42**: Es un pod que forma parte del deployment de gRPC. Tiene 2 contenedores requeridos y 2 disponibles.
+2. **grafana**: Este deployment corresponde al servidor de Grafana, que se utiliza como sistema de dashboards para visualizar los contadores en tiempo real almacenados en Redis.
 
-3. **pod/mongo-69955f78-frb6r**: Es un pod que forma parte del deployment de MongoDB. Tiene 1 contenedor requerido y disponible.
+3. **grpc**: Este deployment corresponde al servidor gRPC, que es uno de los productores encargados de enviar datos a las colas de Kafka.
 
-4. **pod/redis-8576b97f-ptxgk**: Es un pod que forma parte del deployment de Redis. Tiene 1 contenedor requerido y disponible.
+4. **mongo**: Este deployment corresponde al clúster de MongoDB, que se utiliza para almacenar los logs del sistema.
 
-5. **pod/rust-78c88bf4df-r2dfl**: Es un pod que forma parte del deployment de Rust. Tiene 2 contenedores requeridos y disponibles.
+5. **my-cluster-entity-operator**: Este deployment se crea al instalar Kafka.
 
-### Services:
+6. **redis**: Este deployment corresponde a la base de datos Redis, que se utiliza para almacenar los contadores en tiempo real enviados por los consumidores.
 
-1. **service/grafana**: Es un servicio de tipo LoadBalancer que expone el deployment de Grafana. Tiene una IP externa asignada (35.188.97.130) y expone el puerto 30003:32590/TCP.
+7. **rust**: Este deployment corresponde al servidor Rust, que es el otro productor encargado de enviar datos a las colas de Kafka.
 
-2. **service/service-kuberntes**: Es un servicio de tipo ClusterIP que expone el clúster de Kubernetes. No tiene IP externa asignada.
+8. **strimzi-cluster-operator**: Este deployment es un operador relacionado con el servidor de Kafka (Strimzi).
 
-3. **service/service-grpc**: Es un servicio de tipo LoadBalancer que expone el deployment del servidor gRPC. Tiene una IP externa asignada (34.133.31.120) y expone los puertos 30002:31271/TCP y 30001:30461/TCP.
+### Services
 
-4. **service/service-mongo**: Es un servicio de tipo LoadBalancer que expone el deployment de MongoDB. Tiene una IP externa asignada (35.193.21.119) y expone el puerto 27017:32140/TCP.
+1. **grafana**: Este servicio de tipo LoadBalancer expone el deployment de Grafana. Tiene una IP externa asignada (35.188.97.130) y expone el puerto 30000:32590/TCP.
 
-5. **service/service-redis**: Es un servicio de tipo LoadBalancer que expone el deployment de Redis. Tiene una IP externa asignada (35.194.26.26) y expone el puerto 6379:32425/TCP.
+2. **kubernetes**: Este servicio de tipo ClusterIP expone el clúster de Kubernetes.
 
-6. **service/service-rust**: Es un servicio de tipo LoadBalancer que expone el deployment del servidor Wasm (Rust). Tiene una IP externa asignada (35.239.31.125) y expone los puertos 8000:32094/TCP y 8080:32383/TCP.
+3. **my-cluster-kafka-bootstrap**: Este servicio de tipo ClusterIP está relacionado con el servidor de Kafka (Strimzi).
+
+4. **my-cluster-kafka-brokers**: Este servicio de tipo ClusterIP  está relacionado con el servidor de Kafka (Strimzi).
+
+5. **my-cluster-zookeeper-client**: Este servicio de tipo ClusterIP está relacionado con ZooKeeper, que se utiliza en conjunto con Kafka.
+
+6. **my-cluster-zookeeper-nodes**: Este servicio de tipo ClusterIP está relacionado con ZooKeeper.
+
+7. **service-grpc**: Este servicio de tipo ClusterIP expone el deployment del servidor gRPC. Expone los puertos 3002/TCP y 3001/TCP.
+
+8. **service-mongo**: Este servicio de tipo LoadBalancer expone el deployment de MongoDB. Tiene una IP externa asignada (35.193.21.119) y expone el puerto 27017:32140/TCP.
+
+9. **service-redis**: Este servicio de tipo LoadBalancer expone el deployment de Redis. Tiene una IP externa asignada (35.194.26.20) y expone el puerto 6379:32425/TCP.
+
+10. **service-rust**: Este servicio de tipo ClusterIP expone el deployment del servidor Wasm (Rust). Expone los puertos 8000/TCP y 8080/TCP.
 
 ## Ejemplo de Funcionamiento con Capturas de Pantalla
 

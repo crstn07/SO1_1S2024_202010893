@@ -1,23 +1,59 @@
-use rocket::response::status::BadRequest;
 use rocket::serde::json::{json, Value as JsonValue};
 use rocket::serde::json::Json;
+use rocket::response::status::BadRequest;
 use rocket::config::SecretKey;
 use rocket_cors::{AllowedOrigins, CorsOptions};
+use rdkafka::config::ClientConfig;
+use rdkafka::producer::{FutureProducer, FutureRecord};
+use rdkafka::util::Timeout;
+use std::time::Duration;
 
-#[derive(rocket::serde::Deserialize)]
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize)]
 struct Data {
+    #[serde(rename = "name")]
     name: String,
+    #[serde(rename = "album")]
     album: String,
+    #[serde(rename = "year")]
     year: String,
+    #[serde(rename = "rank")]
     rank: String,
 }
 
+
 #[rocket::post("/data", data = "<data>")]
-fn receive_data(data: Json<Data>) -> Result<String, BadRequest<String>> {
+async fn receive_data(data: Json<Data>) -> Result<String, BadRequest<String>> {
     let received_data = data.into_inner();
     let response = JsonValue::from(json!({
-        "message": format!("Received data: Name: {}, Year: {}, Album: {}, Rank: {}", received_data.name, received_data.album, received_data.year, received_data.rank)
+        "message": format!("Received data: name: {}, year: {}, album: {}, rank: {}", received_data.name, received_data.album, received_data.year, received_data.rank)
     }));
+
+    // Configuración del productor Kafka
+    let producer: FutureProducer = ClientConfig::new()
+        .set("bootstrap.servers", "my-cluster-kafka-bootstrap:9092")
+        .create()
+        .expect("Producer creation error");
+
+    // Tema al que enviar mensajes
+    let topic = "votaciones";
+
+    // Serializar datos a JSON
+    let json_data = serde_json::to_string(&received_data).unwrap();
+
+    // Enviar mensaje al tema
+    producer
+        .send(
+            FutureRecord::to(topic)
+                .payload(&json_data)
+                .key("key") // Puedes definir una clave si es necesario
+                .timestamp(Duration::from_secs(0).as_secs().try_into().unwrap()), // Opcional: marcar el tiempo del mensaje
+            Timeout::Never, // Opcional: configurar un tiempo de espera
+        )
+        .await
+        .unwrap();
+
     Ok(response.to_string())
 }
 
