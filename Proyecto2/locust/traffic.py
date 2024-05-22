@@ -32,7 +32,7 @@ class readFile():
             print(f'Error : {Exception}')
 
 class trafficData(HttpUser):
-    wait_time = between(0.1, 0.2) #Tiempo de espera entre registros
+    wait_time = between(0.1, 0.5) #Tiempo de espera entre registros
     reader = readFile()
     reader.loadFile()
 
